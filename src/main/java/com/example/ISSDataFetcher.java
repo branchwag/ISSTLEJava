@@ -31,7 +31,7 @@ public class ISSDataFetcher {
 			String line2 = json.getString("line2");
 
 			try (Connection conn = DriverManager.getConnection(DB_URL)) {
-				String sql = "INSERT OR REPLACE INTO ISSData (satelliteId, name, date, line1, line2) VALUES (?, ?, ?, ?, ?)";
+				String sql = "INSERT INTO ISSData (satelliteId, name, date, line1, line2) VALUES (?, ?, ?, ?, ?)";
 				
 				try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 					pstmt.setInt(1, satelliteId);
