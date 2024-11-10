@@ -20,12 +20,18 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.36.0.3</version>
-            </dependency>   
+        </dependency>   
         <!-- JSON Dependency for org.json library -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20210307</version>
+        </dependency>
+        <!-- ORE Dependency for Orbital Mechanics Calcs -->
+        <dependency>
+            <groupId>org.orekit</groupId>
+            <artifactId>orekit</artifactId>
+            <version>11.3.1</version>
         </dependency>
         <!-- Add other dependencies here as needed -->
     </dependencies>

@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import org.json.JSONObject;
+import java.sql.ResultSet;
 
 public class ISSDataFetcher {
 	private static final String DB_URL = "jdbc:sqlite:test.db";
@@ -32,6 +33,7 @@ public class ISSDataFetcher {
 
 			try (Connection conn = DriverManager.getConnection(DB_URL)) {
 				String sql = "INSERT INTO ISSData (satelliteId, name, date, line1, line2) VALUES (?, ?, ?, ?, ?)";
+				String getLatLong = "SELECT line1, line2, date FROM ISSData WHERE id = ?";
 				
 				try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 					pstmt.setInt(1, satelliteId);
@@ -42,7 +44,23 @@ public class ISSDataFetcher {
 
 					pstmt.executeUpdate();
 					System.out.println("Data successfully inserted into database.");
-			}
+				}
+
+				try (PreparedStatement pstmt = conn.prepareStatement(getLatLong)) {
+					pstmt.setInt(1, 1); //id, make var later
+					ResultSet rs = pstmt.executeQuery();
+
+					if (rs.next()) {
+						ISSPositionCalculator calculator = new ISSPositionCalculator(
+							rs.getString("line1"),
+							rs.getString("line2"),
+							rs.getString("date")
+							);
+						ISSPositionCalculator.Position position = calculator.calculatePosition();
+						System.out.println(position);
+						}
+				}
+
 		}
 	} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
