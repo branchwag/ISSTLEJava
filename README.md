@@ -6,4 +6,5 @@ https://api.nasa.gov/
 ```
 mvn compile
 mvn exec:java -Dexec.mainClass="whiterabbit.ISSDataFetcher"
+mvn exec:java -Dexec.mainClass="whiterabbit.ISSPositionCalculator"
 ```

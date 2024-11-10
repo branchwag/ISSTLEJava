@@ -13,12 +13,18 @@ import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.IERSConventions;
 import org.orekit.utils.PVCoordinates;
-
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ISSPositionCalculator {
+	private static final String DB_URL = "jdbc:sqlite:test.db";
 	private final String line1;
 	private final String line2;
 	private final String date;
@@ -76,17 +82,75 @@ public class ISSPositionCalculator {
 
 	}
 
-    // Example usage
+	private static class UncalculatedPosition {
+		final int id;
+		final String line1;
+		final String line2;
+		final String date;
+
+		UncalculatedPosition(int id, String line1, String line2, String date) {
+			this.id = id;
+			this.line1 = line1;
+			this.line2 = line2;
+			this.date = date;
+		}
+	}
+
+	private static List<UncalculatedPosition> findUncalculatedPositions() throws Exception {
+		List<UncalculatedPosition> positions = new ArrayList<>();
+		String sql = "SELECT id, line1, line2, date FROM ISSData WHERE latitude IS NULL OR longitude IS NULL";
+
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		ResultSet rs = pstmt.executeQuery()) {
+			while (rs.next()) {
+				positions.add(new UncalculatedPosition(
+					rs.getInt("id"),
+					rs.getString("line1"),
+					rs.getString("line2"),
+					rs.getString("date")
+					));
+			}
+		}
+		return positions;
+	}
+
+	private static void updatePosition(int id, Position position) throws Exception {
+		String sql = "UPDATE ISSData SET latitude = ?, longitude = ? WHERE id = ?";
+
+		try (Connection conn = DriverManager.getConnection(DB_URL);
+			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setDouble(1, position.latitude);
+			pstmt.setDouble(2, position.longitude);
+			pstmt.setInt(3, id);
+			pstmt.executeUpdate();
+		}
+	}
+
+	public static void calculateAndUpdateAllPositions() throws Exception {
+		List<UncalculatedPosition> uncalculatedPositions = findUncalculatedPositions();
+		System.out.println("Found " + uncalculatedPositions.size() + " positions to calculate");
+
+		for (UncalculatedPosition pos : uncalculatedPositions) {
+			ISSPositionCalculator calculator = new ISSPositionCalculator(pos.line1, pos.line2, pos.date);
+			Position position = calculator.calculatePosition();
+			updatePosition(pos.id, position);
+			System.out.println("Updated position for ID " + pos.id + ": " + position);
+		}
+	}
+
     public static void main(String[] args) {
         try {
-            String line1 = "1 25544U 98067A   24314.17159890 -.00085559  00000+0 -14417-2 0  9996";
-            String line2 = "2 25544  51.6396 317.1493 0010599 158.5386 326.8756 15.51182438481031";
-            String date = "2024-11-09T04:07:06+00:00";
+            //String line1 = "1 25544U 98067A   24314.17159890 -.00085559  00000+0 -14417-2 0  9996";
+            //String line2 = "2 25544  51.6396 317.1493 0010599 158.5386 326.8756 15.51182438481031";
+            //String date = "2024-11-09T04:07:06+00:00";
 
-            ISSPositionCalculator calculator = new ISSPositionCalculator(line1, line2, date);
-            Position position = calculator.calculatePosition();
-            System.out.println(position);
+            //ISSPositionCalculator calculator = new ISSPositionCalculator(line1, line2, date);
+            //Position position = calculator.calculatePosition();
+            //System.out.println(position);
+	    calculateAndUpdateAllPositions();
         } catch (Exception e) {
+	    System.err.println("Error calculating positions: " + e.getMessage());
             e.printStackTrace();
         }
     }
