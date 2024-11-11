@@ -160,6 +160,7 @@ public class ISSMapVisualizer extends JFrame {
 		if (positions.isEmpty()) return;
 
 		//lines connecting positions
+		/*
 		g2d.setColor(new Color(200, 0, 0, 100));
 		g2d.setStroke(new BasicStroke(1.5f));
 
@@ -174,6 +175,7 @@ public class ISSMapVisualizer extends JFrame {
 			);
 			g2d.draw(new Line2D.Double(prev.x, prev.y, curr.x, curr.y));
 		}
+		*/
 
 		//pts and labels
 		g2d.setFont(new Font("Arial", Font.PLAIN, 10));
