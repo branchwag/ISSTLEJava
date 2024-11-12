@@ -1,6 +1,7 @@
 whiterabbit/ISSMapVisualizer$1.class
 whiterabbit/ISSMapVisualizer$PositionData.class
 whiterabbit/ISSMapVisualizer.class
+whiterabbit/ISSMapVisualizer$ISSPositionLayer.class
 whiterabbit/ISSPositionCalculator$UncalculatedPosition.class
 whiterabbit/ISSPositionCalculator.class
 whiterabbit/ISSDataFetcher.class
