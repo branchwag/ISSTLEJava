@@ -27,12 +27,13 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.map.MapViewport;
 
-public class ISSMapVisualizer extends JFrame {
+public class ISSMapVisualizer {
 	private static final String DB_URL = "jdbc:sqlite:test.db";
 	private List<PositionData> positions;
 	private MapContent map;
 	private static final int WIDTH = 1200;
 	private static final int HEIGHT = 600;
+	private JMapFrame mapFrame;
 	
 	static class PositionData {
 		double latitude;
@@ -47,13 +48,7 @@ public class ISSMapVisualizer extends JFrame {
 	}
 
 	public ISSMapVisualizer() {
-		setTitle("ISS Position Map");
-		setSize(WIDTH, HEIGHT);
-		setMinimumSize(new Dimension(800, 400));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadPositions();
-		pack();
-		setLocationRelativeTo(null);
 		SwingUtilities.invokeLater(this::initializeMap);
 	}
 
@@ -72,7 +67,7 @@ public class ISSMapVisualizer extends JFrame {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Error loading positions: " + e.getMessage(),
+			JOptionPane.showMessageDialog(null, "Error loading positions: " + e.getMessage(),
 				"Database Error",
 				JOptionPane.ERROR_MESSAGE);
 		}
@@ -105,14 +100,14 @@ public class ISSMapVisualizer extends JFrame {
 			mapFrame.enableStatusBar(true);
 			mapFrame.enableToolBar(true);
 			mapFrame.setSize(WIDTH, HEIGHT);
+			mapFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 			mapFrame.getMapPane().setDisplayArea(bounds);
-
 			mapFrame.setVisible(true);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(this,
+			JOptionPane.showMessageDialog(null,
 				"Error initializing map: " + e.getMessage(),
 				"Map Error",
 				JOptionPane.ERROR_MESSAGE);
@@ -166,8 +161,7 @@ public class ISSMapVisualizer extends JFrame {
 		SwingUtilities.invokeLater(() -> {
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				ISSMapVisualizer map = new ISSMapVisualizer();
-				map.setVisible(true);
+				new ISSMapVisualizer();
 			} catch (Exception e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null, "Error starting application: " + e.getMessage(), "Application Error",
