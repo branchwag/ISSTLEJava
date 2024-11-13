@@ -9,3 +9,6 @@ mvn exec:java -Dexec.mainClass="whiterabbit.ISSDataFetcher"
 mvn exec:java -Dexec.mainClass="whiterabbit.ISSPositionCalculator"
 mvn exec:java -Dexec.mainClass="whiterabbit.ISSMapVisualizer"
 ```
+
+
+<img src="./ISSmap.png" alt= "GUI">
